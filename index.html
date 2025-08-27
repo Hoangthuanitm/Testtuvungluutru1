@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>専門用語テスト</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Roboto', sans-serif;
+      background-color: #F5F7FA;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 800px;
+      width: 100%;
+    }
+    .header {
+      background-color: #4A90E2;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .header p {
+      margin: 5px 0 0;
+      font-size: 16px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .error-message {
+      color: #EF4444;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:not(.reset) {
+      background-color: #4A90E2;
+      color: white;
+    }
+    button:not(.reset):hover {
+      background-color: #357ABD;
+    }
+    .reset {
+      background-color: #EF4444;
+      color: white;
+    }
+    .reset:hover {
+      background-color: #DC2626;
+    }
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      display: none;
+    }
+    #questions {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .answer-feedback {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .correct {
+      color: #2ECC71;
+    }
+    .incorrect {
+      color: #EF4444;
+    }
+    #results {
+      display: none;
+      margin-top: 20px;
+    }
+    #results h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    #score-display {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #password-error {
+      color: #EF4444;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      .header h1 {
+        font-size: 20px;
+      }
+      .header p {
+        font-size: 14px;
+      }
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      .modal-content {
+        width: 95%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>専門用語テスト</h1>
+      <p>時間：30 分</p>
+    </div>
+    <div id="info-form">
+      <div class="form-group">
+        <label for="name">名前（なまえ）</label>
+        <input type="text" id="name" placeholder="Tên của bạn" aria-required="true">
+      </div>
+      <div class="form-group">
+        <label for="class">クラス</label>
+        <input type="text" id="class" placeholder="Lớp học" aria-required="true">
+      </div>
+      <div class="form-group">
+        <label for="date">日付</label>
+        <input type="date" id="date" value="2025-08-28" aria-required="true">
+      </div>
+      <div id="message-info" class="error-message" role="alert"></div>
+    </div>
+    <div class="button-group">
+      <button id="start-test">Bắt đầu làm bài</button>
+      <button id="history-test" onclick="window.showPasswordModal()">Lịch sử kiểm tra</button>
+    </div>
+    <div id="timer"></div>
+    <div id="questions"></div>
+    <div class="button-group" id="submit-reset-buttons" style="display: none;">
+      <button id="submit-test">テストを提出する (Nộp bài)</button>
+      <button class="reset" id="reset-test" onclick="window.resetTest()" style="display: none;">Làm lại</button>
+    </div>
+    <div id="results">
+      <h2>Kết quả</h2>
+      <div id="score-display"></div>
+    </div>
+  </div>
+  <div id="password-modal" class="modal" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <h2 id="modal-title">Nhập mật khẩu</h2>
+      <input type="password" id="password-input" placeholder="Mật khẩu" maxlength="10" aria-required="true">
+      <div id="password-error" class="error-message" role="alert"></div>
+      <div class="button-group">
+        <button id="confirm-password">Xác nhận</button>
+        <button class="reset" onclick="window.closePasswordModal()">Hủy</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const DATA = [
+      { jp: "預り金（あずかりきん）", vi: "Tiền ký quỹ" },
+      { jp: "アップセル戦略", vi: "Chiến lược bán hàng gia tăng" },
+      { jp: "アラカルト", vi: "Gọi món riêng" },
+      { jp: "１泊２食（いっぱくにしょく）", vi: "Gói lưu trú 1 đêm 2 bữa" },
+      { jp: "一汁三菜（いちじゅうさんさい）", vi: "Một canh ba món" },
+      { jp: "イールドマネジメント", vi: "Quản lý doanh thu" },
+      { jp: "インバウンド", vi: "Du lịch nhắm đến du khách nước ngoài" },
+      { jp: "ヴィーガン", vi: "Ăn chay tuyệt đối" },
+      { jp: "ウェルカムドリンク", vi: "Đồ uống chào đón" },
+      { jp: "ウォークイン", vi: "Khách vãng lai" },
+      { jp: "営業許可（えいぎょうきょか）", vi: "Giấy phép kinh doanh" },
+      { jp: "衛生（えいせい）", vi: "Vệ sinh" },
+      { jp: "オーバーブッキング", vi: "Đặt chỗ vượt quá (sức chứa)" },
+      { jp: "おもてなし", vi: "Sự hiếu khách" },
+      { jp: "オールインクルーシブ", vi: "Gói lưu trú trọn gói" },
+      { jp: "害虫駆除（がいちゅうくじょ）", vi: "Diệt côn trùng" },
+      { jp: "カスターセット", vi: "Bộ gia vị – Bộ dụng cụ" },
+      { jp: "換気（かんき）", vi: "Thông gió" },
+      { jp: "観光協会（かんこうきょうかい）", vi: "Hiệp hội du lịch" },
+      { jp: "館内（かんない）", vi: "Bên trong cơ sở lưu trú" },
+      { jp: "館内利用（かんないりよう）", vi: "Sử dụng dịch vụ trong cơ sở lưu trú" },
+      { jp: "休憩（きゅうけい）", vi: "Nghỉ giải lao" },
+      { jp: "空室（くうしつ）", vi: "Phòng trống" },
+      { jp: "口コミ（くちこみ）", vi: "Đánh giá truyền miệng" },
+      { jp: "敬意（けいい）", vi: "Kính trọng" },
+      { jp: "敬語（けいご）", vi: "Kính ngữ" },
+      { jp: "軽食（けいしょく）", vi: "Bữa ăn nhẹ" },
+      { jp: "個人情報（こじんじょうほう）", vi: "Thông tin cá nhân" },
+      { jp: "採光（さいこう）", vi: "Chiếu sáng tự nhiên" },
+      { jp: "自然災害（しぜんさいがい）", vi: "Thiệt hại do thiên tai" },
+      { jp: "自治体（じちたい）", vi: "Đơn vị hành chính như tỉnh, thành phố, thị trấn" },
+      { jp: "市町村（しちょうそん）", vi: "Đơn vị hành chính: thành phố, thị trấn, làng" },
+      { jp: "自動火災報知設備（じどうかさいほうちせつび）", vi: "Thiết bị cảm biến phát hiện cháy" },
+      { jp: "従業員（じゅうぎょういん）", vi: "Người làm việc trong lĩnh vực lưu trú" },
+      { jp: "宿泊施設（しゅくはくしせつ）", vi: "Cơ sở lưu trú" },
+      { jp: "宿泊者名簿（しゅくはくしゃめいぼ）", vi: "Sổ đăng ký khách lưu trú" },
+      { jp: "宿泊税（しゅくはくぜい）", vi: "Thuế khách lưu trú" },
+      { jp: "宿泊約款（しゅくはくやっかん）", vi: "Hợp đồng giữa cơ sở lưu trú và khách" },
+      { jp: "出勤（しゅっきん）", vi: "Đi làm" },
+      { jp: "手話（しゅわ）", vi: "Ngôn ngữ ký hiệu" },
+      { jp: "旬の食材（しゅんのしょくざい）", vi: "Nguyên liệu thực phẩm theo mùa" },
+      { jp: "上司（じょうし）", vi: "Cấp trên" },
+      { jp: "消毒（しょうどく）", vi: "Khử trùng" },
+      { jp: "消耗品費（しょうもうひんぴ）", vi: "Chi phí vật tư tiêu hao" },
+      { jp: "食材原価（しょくざいげんか）", vi: "Chi phí nguyên liệu đồ ăn, đồ uống" },
+      { jp: "食材原価率（しょくざいげんかりつ）", vi: "Tỷ lệ chi phí nguyên liệu so với doanh thu" },
+      { jp: "食中毒(しょくちゅうどく)", vi: "Ngộ độc thực phẩm" },
+      { jp: "シルバー", vi: "Dùng để chỉ dao, nĩa,... (dụng cụ ăn uống bằng kim loại)" },
+      { jp: "人件費(じんけんひ)", vi: "Chi phí nhân sự" },
+      { jp: "水道光熱費(すいどうこうねつひ)", vi: "Chi phí vận hành cơ sở lưu trú" },
+      { jp: "清潔（せいけつ）", vi: "Sạch sẽ, gọn gàng" },
+      { jp: "清掃（せいそう）", vi: "Lau chùi làm sạch" },
+      { jp: "セグメンテーション", vi: "Phân khúc thị trường" },
+      { jp: "接客（せっきゃく）", vi: "Tiếp đón khách" },
+      { jp: "騒音（そうおん）", vi: "Tạp âm" },
+      { jp: "表記品（ひょうきひん）", vi: "Sản phẩm được ghi trên nhãn" },
+      { jp: "ソムリエ", vi: "Chuyên gia rượu vang" },
+      { jp: "温暖（おんだん）", vi: "Ấm áp" },
+      { jp: "ダイナミックプライシング", vi: "Định giá linh hoạt" },
+      { jp: "タイムシェアリング", vi: "Sở hữu kỳ nghỉ theo thời gian" },
+      { jp: "マーケティング", vi: "Marketing" },
+      { jp: "ダブルブッキング", vi: "Đặt trùng phòng" },
+      { jp: "地産地消（ちさんちしょう）", vi: "Sản vật địa phương" },
+      { jp: "知事（ちじ）", vi: "Thống đốc tỉnh" },
+      { jp: "テイクアウト", vi: "Mang đi" },
+      { jp: "デイユース", vi: "Thuê phòng theo giờ" },
+      { jp: "都道府県（とどうふけん）", vi: "Chỉ 'Đô', 'Đạo', 'Phủ', 'Huyện'" },
+      { jp: "仲居（なかい）", vi: "Nhân viên phục vụ phòng" },
+      { jp: "入湯税（にゅうとうぜい）", vi: "Thuế tắm suối nước nóng" },
+      { jp: "ノーショー", vi: "Khách không đến dù đã đặt trước" },
+      { jp: "配膳（はいぜん）", vi: "Bày biện / Phục vụ món ăn" },
+      { jp: "ハラール", vi: "Thực phẩm ăn kiêng cho người đạo hồi" },
+      { jp: "販売管理費（はんばいかんりひ）", vi: "Chi phí quản lý bán hàng" },
+      { jp: "販売手数料（はんばいてすうりょう）", vi: "Phí hoa hồng" },
+      { jp: "非常口（ひじょうぐち）", vi: "Cửa thoát hiểm" },
+      { jp: "筆談（ひつだん）", vi: "Giao tiếp bằng viết" },
+      { jp: "避難（ひなん）", vi: "Lánh nạn" },
+      { jp: "避難経路（ひなんけいろ）", vi: "Lối thoát hiểm" },
+      { jp: "ブッキングエンジン", vi: "Booking Engine" },
+      { jp: "ブッフェ料理", vi: "Buffet" },
+      { jp: "富裕層（ふゆうそう）", vi: "Tầng lớp giàu có" },
+      { jp: "ブランディング", vi: "Xây dựng thương hiệu" },
+      { jp: "プレスリリース", vi: "Thông cáo báo chí" },
+      { jp: "ベッド＆ブレックファースト（B&B）", vi: "Giá phòng bao gồm bữa sáng" },
+      { jp: "ベジタリアン", vi: "Người ăn chay" },
+      { jp: "防火（ぼうか）", vi: "Phòng cháy" },
+      { jp: "保健所（ほけんじょ）", vi: "Trung tâm y tế công cộng" },
+      { jp: "満室（まんしつ）", vi: "Kín phòng" },
+      { jp: "身だしなみ（みだしなみ）", vi: "Tác phong – diện mạo chỉnh tề" },
+      { jp: "メインディッシュ", vi: "Món chính trong bữa ăn" },
+      { jp: "ユニバーサルデザイン", vi: "Thiết kế cho mọi đối tượng" },
+      { jp: "リネン", vi: "Đồ vải" },
+      { jp: "リピーター", vi: "Khách quen" },
+      { jp: "礼儀作法（れいぎさほう）", vi: "Quy tắc ứng xử" },
+      { jp: "レベニューマネジメント", vi: "Quản lý doanh thu" },
+      { jp: "連泊（れんぱく）", vi: "Lưu trú nhiều đêm liên tiếp" },
+      { jp: "ABC分析", vi: "Phương pháp phân loại các món ăn dựa trên doanh thu" },
+      { jp: "ADR", vi: "Viết tắt của “Average Daily Rate”" },
+      { jp: "F&B コントロール", vi: "Phương pháp quản lý chi phí nguyên liệu và đồ uống" },
+      { jp: "FIT", vi: "Viết tắt của Free Independent Traveler" },
+      { jp: "FL率", vi: "Tỷ lệ chi phí nguyên liệu + chi phí nhân công trên tổng doanh thu" },
+      { jp: "HACCP", vi: "Hệ thống quản lý an toàn thực phẩm" },
+      { jp: "KPI", vi: "Viết tắt của Key Performance Indicator" },
+      { jp: "OCC", vi: "Viết tắt của Occupancy Rate" },
+      { jp: "OTA", vi: "Viết tắt của Online Travel Agent" },
+      { jp: "PMS", vi: "Viết tắt của Property Management System" },
+      { jp: "RevPAR", vi: "Giá trị thể hiện doanh thu trên mỗi phòng" },
+      { jp: "SEO", vi: "Là việc điều chỉnh cấu trúc và nội dung của website" },
+      { jp: "VIP", vi: "Khách hàng đặc biệt quan trọng" }
+    ];
+
+    let questions = [];
+    let answers = [];
+    let timeLeft = 30 * 60;
+    let timerInterval;
+    let isSubmitting = false;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function generateQuestions() {
+      if (DATA.length < 4) {
+        alert('Dữ liệu từ vựng không đủ để tạo câu hỏi!');
+        return false;
+      }
+      questions = shuffle([...DATA]);
+      questions.forEach((q, index) => {
+        const incorrect = shuffle([...DATA])
+          .filter(item => item.vi !== q.vi)
+          .slice(0, 3)
+          .map(item => item.vi);
+        const options = shuffle([q.vi, ...incorrect]);
+        q.options = options;
+        q.id = index;
+      });
+      return true;
+    }
+
+    function renderQuestions() {
+      const questionsDiv = document.getElementById('questions');
+      questionsDiv.innerHTML = '';
+      questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+        questionDiv.innerHTML = `
+          <h3>Câu ${index + 1}: ${q.jp}</h3>
+          <div class="options">
+            ${q.options.map((option, i) => `
+              <div class="option">
+                <input type="radio" name="q${q.id}" id="q${q.id}_${i}" value="${option}">
+                <label for="q${q.id}_${i}">${option}</label>
+              </div>
+            `).join('')}
+          </div>
+          <div class="answer-feedback" id="feedback-${q.id}"></div>
+        `;
+        questionsDiv.appendChild(questionDiv);
+      });
+    }
+
+    function startTimer() {
+      document.getElementById('timer').style.display = 'block';
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer').textContent = 'Hết giờ!';
+          submitTest();
+          return;
+        }
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = `Thời gian còn lại: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      }, 1000);
+    }
+
+    function validateForm() {
+      const name = document.getElementById('name').value.trim();
+      const className = document.getElementById('class').value.trim();
+      const date = document.getElementById('date').value;
+      const messageDiv = document.getElementById('message-info');
+      const today = '2025-08-28';
+
+      if (!name || name.length < 2) {
+        messageDiv.textContent = 'Tên phải có ít nhất 2 ký tự!';
+        messageDiv.style.display = 'block';
+        return false;
+      }
+      if (!className || className.length < 2) {
+        messageDiv.textContent = 'Lớp phải có ít nhất 2 ký tự!';
+        messageDiv.style.display = 'block';
+        return false;
+      }
+      if (date !== today && new Date(date) > new Date(today)) {
+        messageDiv.textContent = 'Vui lòng chọn ngày hợp lệ (không được chọn ngày trong tương lai)!';
+        messageDiv.style.display = 'block';
+        return false;
+      }
+      messageDiv.style.display = 'none';
+      return true;
+    }
+
+    window.startTest = function() {
+      if (!validateForm()) return;
+      if (!generateQuestions()) return;
+      renderQuestions();
+      document.getElementById('info-form').style.display = 'none';
+      document.getElementById('start-test').style.display = 'none';
+      document.getElementById('history-test').style.display = 'none';
+      document.getElementById('submit-reset-buttons').style.display = 'flex';
+      document.getElementById('reset-test').style.display = 'none';
+      startTimer();
+    };
+
+    function disableQuestions() {
+      const inputs = document.querySelectorAll('input[type="radio"]');
+      inputs.forEach(input => input.disabled = true);
+    }
+
+    function submitTest() {
+      if (isSubmitting) return;
+      isSubmitting = true;
+      clearInterval(timerInterval);
+      answers = questions.map((q, index) => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const chosenVI = selected ? selected.value : 'Không chọn';
+        const isCorrect = chosenVI === q.vi;
+        const feedbackDiv = document.getElementById(`feedback-${q.id}`);
+        if (isCorrect) {
+          feedbackDiv.textContent = 'Đúng!';
+          feedbackDiv.className = 'answer-feedback correct';
+        } else {
+          feedbackDiv.textContent = `Sai! Đáp án đúng: ${q.vi}`;
+          feedbackDiv.className = 'answer-feedback incorrect';
+        }
+        return { questionJP: q.jp, correctVI: q.vi, chosenVI, isCorrect };
+      });
+      disableQuestions();
+      const score = answers.filter(a => a.isCorrect).length;
+      const totalQuestions = questions.length;
+      const percentage = (score / totalQuestions) * 100;
+      let evaluation;
+      if (percentage >= 80) evaluation = 'A';
+      else if (percentage >= 60) evaluation = 'B';
+      else if (percentage >= 40) evaluation = 'C';
+      else if (percentage >= 20) evaluation = 'D';
+      else evaluation = 'F';
+
+      document.getElementById('score-display').textContent = `Điểm: ${score}/${totalQuestions} (${percentage.toFixed(2)}%) - Xếp loại: ${evaluation}`;
+      document.getElementById('submit-reset-buttons').style.display = 'flex';
+      document.getElementById('reset-test').style.display = 'block';
+      document.getElementById('submit-test').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('timer').style.display = 'none';
+
+      const history = {
+        name: document.getElementById('name').value.trim(),
+        className: document.getElementById('class').value.trim(),
+        dateInput: document.getElementById('date').value,
+        score,
+        totalQuestions,
+        percentage: percentage.toFixed(2),
+        evaluation,
+        timeStart: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        timeEnd: new Date().toISOString(),
+        timeTakenSec: 30 * 60 - timeLeft,
+        details: answers
+      };
+      try {
+        const historyList = JSON.parse(localStorage.getItem('testtuvungluutru') || '[]');
+        historyList.push(history);
+        localStorage.setItem('testtuvungluutru', JSON.stringify(historyList));
+      } catch (e) {
+        console.error('Lỗi khi lưu vào localStorage:', e);
+        alert('Không thể lưu lịch sử do lỗi lưu trữ!');
+      }
+
+      try {
+        // Placeholder Firestore config
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+          const db = firebase.firestore();
+          db.collection('test_results').add(history);
+        }
+      } catch (e) {
+        console.error('Firestore error:', e);
+      }
+      isSubmitting = false;
+    }
+
+    document.getElementById('submit-test').addEventListener('click', submitTest);
+
+    window.resetTest = function() {
+      document.getElementById('info-form').style.display = 'block';
+      document.getElementById('start-test').style.display = 'block';
+      document.getElementById('history-test').style.display = 'block';
+      document.getElementById('submit-reset-buttons').style.display = 'none';
+      document.getElementById('questions').innerHTML = '';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('timer').style.display = 'none';
+      document.getElementById('name').value = '';
+      document.getElementById('class').value = '';
+      document.getElementById('date').value = '2025-08-28';
+      document.getElementById('message-info').style.display = 'none';
+      clearInterval(timerInterval);
+      timeLeft = 30 * 60;
+      questions = [];
+      answers = [];
+      isSubmitting = false;
+    };
+
+    window.showPasswordModal = function() {
+      document.getElementById('password-modal').style.display = 'flex';
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-error').style.display = 'none';
+      document.getElementById('password-input').focus();
+    };
+
+    window.closePasswordModal = function() {
+      document.getElementById('password-modal').style.display = 'none';
+    };
+
+    let isCheckingPassword = false;
+    window.checkPassword = function() {
+      if (isCheckingPassword) return;
+      isCheckingPassword = true;
+      const password = document.getElementById('password-input').value;
+      const errorDiv = document.getElementById('password-error');
+      if (password === '112') {
+        window.location.href = 'history.html';
+      } else {
+        errorDiv.textContent = 'Mật khẩu sai!';
+        errorDiv.style.display = 'block';
+      }
+      setTimeout(() => { isCheckingPassword = false; }, 500);
+    };
+
+    document.getElementById('start-test').addEventListener('click', startTest);
+    document.getElementById('confirm-password').addEventListener('click', window.checkPassword);
+  </script>
+</body>
+</html>
