@@ -452,16 +452,17 @@
     }
 
     window.startTest = function() {
-      if (!validateForm()) return;
-      if (!generateQuestions()) return;
-      renderQuestions();
-      document.getElementById('info-form').style.display = 'none';
-      document.getElementById('start-test').style.display = 'none';
-      document.getElementById('history-test').style.display = 'none';
-      document.getElementById('submit-reset-buttons').style.display = 'flex';
-      document.getElementById('reset-test').style.display = 'none';
-      startTimer();
-    };
+  if (!validateForm()) return;
+  if (!generateQuestions()) return;
+  renderQuestions();
+  document.getElementById('info-form').style.display = 'none';
+  document.getElementById('start-test').style.display = 'none';
+  document.getElementById('history-test').style.display = 'none';
+  document.getElementById('submit-reset-buttons').style.display = 'flex';
+  document.getElementById('reset-test').style.display = 'none';
+  document.getElementById('submit-test').style.display = 'block'; // Thêm dòng này
+  startTimer();
+};
 
     function disableQuestions() {
       const inputs = document.querySelectorAll('input[type="radio"]');
