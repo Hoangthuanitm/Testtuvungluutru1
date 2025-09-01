@@ -1992,9 +1992,9 @@ const questions = [
             clearInterval(timerInterval);
             document.getElementById('timer').style.display = 'none';
             document.getElementById('submit-test').style.display = 'none';
-            const section1Score = calculateRadioSectionScore(1, 40, 1);
+            const section1Score = calculateRadioSectionScore(1, 109, 1);
             const totalRawScore = section1Score || 0;
-            const percentage = (totalRawScore / 40) * 100 || 0;
+            const percentage = (totalRawScore / 109) * 100 || 0;
             const totalScore = Math.round(percentage) || 0;
             const evaluation = getEvaluation(percentage);
             const rankClass = evaluation === 'A' ? 'rank-a' : evaluation === 'F' ? 'rank-f' : '';
@@ -2020,7 +2020,7 @@ const questions = [
                             <td>${dateInput || new Date().toLocaleDateString('vi-VN')}</td>
                             <td>${formatTime(startTime) || '00:00:00'}</td>
                             <td>${formatTime(endTime) || '00:00:00'}</td>
-                            <td>${totalRawScore}/40</td>
+                            <td>${totalRawScore}/109</td>
                             <td>${Math.round(percentage)}%</td>
                             <td><span class="${rankClass || 'rank-f'}">${evaluation || 'F'}</span></td>
                         </tr>
